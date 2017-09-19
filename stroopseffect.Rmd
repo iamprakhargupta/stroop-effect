@@ -1,0 +1,167 @@
+---
+title: "Stroop Effect"
+author: "Prakhar gupta"
+output:
+  html_document: default
+  html_notebook: default
+  
+---
+#### Whats is Stroop Effect
+
+The effect was named after John Ridley Stroop, who published the effect in English in 1935 in an article in the Journal of Experimental Psychology entitled "Studies of interference in serial verbal reactions" that includes three different experiments. However, the effect was first published in 1929 in Germany by Erich Rudolf Jaensch, and its roots can be followed back to works of James McKeen Cattell and Wilhelm Maximilian Wundt in the nineteenth century.
+
+#### 1. What is our independent variable? What is our dependent variable?
+
+Dependent variable
+
+The time taken by a test subject to read the word of each category
+
+Independant variable
+
+The type of words used in the stroop effect read by the test subject (congruent or incongruent) .The type of word is independant variable here
+
+#### 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices.
+
+
+We will represent congruent as c and incongruent as I .
+
+The mean of congruent sample will be 
+$$\mu_C$$
+the mean of incongruent will be 
+$$\mu_I$$
+
+##### Null hypothesis
+
+The condition of words doesnot have any effect on time taken.i.e the means of congruent and incongruent will be same and equal
+
+$$  \mu_I - \mu_C = 0$$
+
+##### Alternative hypothesis
+
+The mean time of both the condition of words are significantly different
+
+$$ \mu_I-\mu_C \neq 0$$
+
+We will perform a t test instead of z test
+as we are given a sample of 24 dataset and not the whole population.z test are performed on population while t test are performed on samples
+
+We will perform a two tail test as we are only concerned with finding whether there is a significant difference between congruent and incongruent means
+
+#### 3. Report some descriptive statistics regarding this dataset. Include at least one measure of central tendency and at least one measure of variability.
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+inf=read.csv("stroopdata.csv")
+summary(inf)
+```
+
+The minimum value of congruent is 8.63 and for Incongruent is 15.69.The median and mean are both higher for Incongruent in comparision with congruent
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+print ("Standard deviation")
+sapply(inf, sd, na.rm = TRUE)
+```
+
+The above r output gives us the standard deviation on both congruent and Incongruent observations
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+print ("Inter quatile range")
+sapply(inf, IQR, na.rm = TRUE)
+```
+The above r output gives the IQR of both the cases
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+library(ggplot2)
+library(gridExtra)
+p1<-ggplot(aes(Congruent),data=inf)+
+  geom_histogram(binwidth = 2)+
+  scale_x_continuous(breaks = seq(0,24,2))+
+  ggtitle("Histogram of congruent values")
+p2<-ggplot(aes(Incongruent),data=inf)+
+  geom_histogram(binwidth = 2)+
+  scale_x_continuous(breaks = seq(0,40,2))+
+  ggtitle("Histogram of noncongruent values")
+grid.arrange(p1,p2,ncol=2)
+```
+
+The histograms show the data in amuch better way we can see that congruent has a bimodal distribution while we can see than there is no value between 28 to 32 in Incongruent
+
+
+#### 4. Provide one or two visualizations that show the distribution of the sample data. Write one or two sentences noting what you observe about the plot or plots.
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+
+inf$num=seq(1:24)
+inf$d=inf$Congruent-inf$Incongruent
+ggplot(data=inf)+
+  geom_line(aes(num,inf$Congruent),color='blue')+
+  geom_line(aes(num,inf$Incongruent),color='red')+
+  geom_line(aes(num,inf$d),color="Black",linetype=2)+
+  ylab("time in seconds")+
+  xlab("readings")+
+  ggtitle("Line plot of data")+
+  scale_x_continuous(breaks =seq(1,24,1))+
+  geom_hline(yintercept = 0)+
+   scale_y_continuous(breaks =seq(-25,40,5))
+```
+
+Above is a line graph of sample timings showing the readings for each observation for both incongruent and congruent
+
+The red line is for Incongruent
+The Blue line is for Congruent
+The dashed black is for the difference between both 
+
+$$D_i=C_i -I_i$$
+Clearly we can see that for all the sample readings the incongruent sample values are higher than tha of congruents ones
+
+
+```{r echo=FALSE, message =FALSE, warning =FALSE}
+
+p1 = ggplot(aes(x = "", y = time(seconds)), data = inf) + 
+  geom_boxplot(aes(y = inf$Congruent)) + xlab('Congruent')+
+ ggtitle('Box Plot for Congruent sample')
+p2 = ggplot(aes(x = "", y = time(seconds)), data = inf) + 
+  geom_boxplot(aes(y = inf$Incongruent))+ 
+ ggtitle('Box Plot for Incongruent sample') + xlab('Incongruent')
+grid.arrange(p1,p2, ncol =2)
+```
+
+
+
+The boxplots visually shows the ranges and median of both congruent and Incongruent sample values
+
+#### 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
+
+Test is two tailed paired t test for p = 0.05 therefore
+ 
+ t critical  = 2.069 for df = 23(n=24 and df=n-1)
+ 
+ SD of the differences = 4.86
+ 
+ SEM = 0.99
+ 
+ CI=95%
+ 
+ alpha level=0.05
+ 
+ 
+ t value =  -8.04
+ 
+ So the t value falls way into the left tail critical region making us reject the null hypothesis.
+ We can conclude that the condition of word does have an effect on time take to read it proving our alternative hypothesis
+
+The negative t value means that the difference of mean of congruent and incongruent is less than zero.
+It further confirms our finding in line plot where we saw that each data poin has heigher value of Incongruent vs Congruent
+
+ This estabishes the existence of stroop effect.
+ 
+ The p value for t = -8.03 taken from graphpad website 
+  is lesser than 0.0001
+  
+ cohen's D = -1.64
+ 
+ R^2 = .74
+
+
+
+
+
